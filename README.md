@@ -2,12 +2,19 @@
 
 Upload a PDF, ask questions about it in plain English. The app finds the relevant sections and uses Google's Gemini to answer — strictly from your document, not from the model's general knowledge.
 
+## 🌐 Live Demo
+
+| Layer    | URL                                                                                       |
+| :------- | :---------------------------------------------------------------------------------------- |
+| Frontend | [doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app](https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app) |
+| Backend  | [docmind-pdf-q-a-chatbot-production.up.railway.app](https://docmind-pdf-q-a-chatbot-production.up.railway.app) |
+
 ---
 
 ## What it does
 
 - Extracts text from any uploaded PDF using PyMuPDF
-- Splits the text into overlapping chunks and embeds them locally using `all-MiniLM-L6-v2`
+- Splits the text into overlapping chunks and embeds them locally using `paraphrase-MiniLM-L3-v2`
 - Stores vectors in a FAISS index (in memory, no database needed)
 - On each question, retrieves the top 5 matching chunks and sends them to Gemini with a strict grounding prompt
 - If the answer isn't in the document, it says so instead of making something up
@@ -17,9 +24,11 @@ Upload a PDF, ask questions about it in plain English. The app finds the relevan
 
 ## Stack
 
-**Backend:** Python 3.10+, FastAPI, LangChain, FAISS (CPU), PyMuPDF, Google Generative AI SDK, python-dotenv
+**Backend:** Python 3.10+, FastAPI, LangChain, FAISS (CPU), PyMuPDF, Sentence Transformers, Google Generative AI SDK, python-dotenv
 
-**Frontend:** React 18, Vite, plain CSS
+**Frontend:** React 18, Vite 5, plain CSS (dark theme, Inter font)
+
+**Deployment:** Backend on Railway · Frontend on Vercel
 
 ---
 
@@ -28,23 +37,23 @@ Upload a PDF, ask questions about it in plain English. The app finds the relevan
 ```text
 Rag_chatbot/
 ├── backend/
-│   ├── main.py             # FastAPI endpoints (upload, chat, health)
-│   ├── rag_pipeline.py     # Extraction, chunking, embedding, FAISS, generation
-│   ├── requirements.txt
-│   ├── .env.example
-│   └── .env                # Not committed — add your API key here
+│   ├── main.py             # FastAPI app (upload, chat, health endpoints + CORS)
+│   ├── rag_pipeline.py     # Text extraction, chunking, embedding, FAISS, Gemini generation
+│   ├── requirements.txt    # Pinned Python dependencies
+│   ├── .env.example        # Template — copy to .env and add your key
+│   └── .env                # Not committed — contains your GEMINI_API_KEY
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ChatWindow.jsx
-│   │   │   ├── MessageBubble.jsx
-│   │   │   ├── SourceDrawer.jsx
-│   │   │   └── UploadZone.jsx
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   └── index.css
-│   ├── index.html
-│   ├── vite.config.js
+│   │   │   ├── ChatWindow.jsx    # Message list, input form, typing indicator
+│   │   │   ├── MessageBubble.jsx # Single chat bubble (user / AI)
+│   │   │   ├── SourceDrawer.jsx  # Expandable source-chunk viewer
+│   │   │   └── UploadZone.jsx    # Drag-and-drop PDF upload
+│   │   ├── App.jsx         # Root component (sidebar + chat, localStorage persistence)
+│   │   ├── App.css          # Full design system — dark theme, animations, responsive
+│   │   └── main.jsx         # React 18 entry point
+│   ├── index.html           # HTML shell (meta tags, Inter font, favicon)
+│   ├── vite.config.js       # Vite dev server + proxy config
 │   └── package.json
 ├── .gitignore
 └── README.md
@@ -86,7 +95,7 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-> First run will download the `all-MiniLM-L6-v2` model (~90MB) from Hugging Face. It gets cached after that.
+> First run will download the `paraphrase-MiniLM-L3-v2` model (~60 MB) from Hugging Face. It gets cached after that.
 
 Copy the env template and add your key:
 
@@ -99,7 +108,11 @@ cp .env.example .env
 ```
 
 Open `.env` and set:
+
+```
 GEMINI_API_KEY=your_actual_gemini_api_key_here
+```
+
 Start the server:
 
 ```bash
@@ -119,6 +132,16 @@ npm run dev
 ```
 
 Frontend runs at `http://localhost:5173`. Vite proxies all `/upload`, `/chat`, and `/health` requests to port 8000, so no CORS config is needed locally.
+
+---
+
+## Environment variables
+
+| Variable         | Where        | Required | Description                                          |
+| :--------------- | :----------- | :------- | :--------------------------------------------------- |
+| `GEMINI_API_KEY` | Backend `.env` | **Yes**  | Google Gemini API key from [AI Studio](https://aistudio.google.com/app/apikey) |
+
+For production (Railway), set `GEMINI_API_KEY` as an environment variable in the dashboard — do not use a `.env` file.
 
 ---
 
@@ -167,7 +190,7 @@ These constants are at the top of `backend/rag_pipeline.py`:
 | `CHUNK_SIZE` | `500` | Characters per chunk |
 | `CHUNK_OVERLAP` | `50` | Overlap between adjacent chunks |
 | `TOP_K` | `5` | Chunks retrieved per query |
-| `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Local embedding model |
+| `EMBEDDING_MODEL` | `paraphrase-MiniLM-L3-v2` | Local embedding model |
 
 Smaller chunks give more precise retrieval but may lose context within a single idea. Larger chunks preserve context but dilute the semantic signal. 500/50 is a reasonable starting point for most documents.
 
@@ -190,8 +213,47 @@ Never commit your `.env` file. If you accidentally push your API key, revoke it 
 
 ---
 
-## Deploying
+## Deployment
 
-**Backend:** Render, Railway, or Heroku work fine. Use `gunicorn -k uvicorn.workers.UvicornWorker main:app` as the start command and set `GEMINI_API_KEY` as an environment variable in the dashboard.
+### Backend — Railway
 
-**Frontend:** Build with `npm run build` inside `frontend/`, then deploy the `dist/` folder to Vercel or Netlify. If the backend is on a separate domain, add that domain to `allow_origins` in `backend/main.py`.
+1. Connect the GitHub repository to [Railway](https://railway.app).
+2. Set the **root directory** to `backend`.
+3. Add the environment variable `GEMINI_API_KEY` in the Railway dashboard.
+4. Set the **start command** to:
+   ```
+   gunicorn -k uvicorn.workers.UvicornWorker main:app
+   ```
+5. Railway auto-deploys on every push to `main`.
+
+Live backend URL: `https://docmind-pdf-q-a-chatbot-production.up.railway.app`
+
+### Frontend — Vercel
+
+1. Connect the GitHub repository to [Vercel](https://vercel.com).
+2. Set the **root directory** to `frontend`.
+3. **Framework preset:** Vite.
+4. **Build command:** `npm run build`
+5. **Output directory:** `dist`
+6. No environment variables are needed — the backend URL is hardcoded in `App.jsx` and `UploadZone.jsx` as:
+   ```
+   https://docmind-pdf-q-a-chatbot-production.up.railway.app
+   ```
+7. Vercel auto-deploys on every push to `main`.
+
+Live frontend URL: `https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app`
+
+### CORS
+
+The backend allows requests from these origins (configured in `backend/main.py`):
+
+- `http://localhost:5173` — local Vite dev server
+- `https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app` — production Vercel frontend
+
+If you redeploy the frontend to a different domain, add that domain to the `allow_origins` list in `backend/main.py`.
+
+---
+
+## License
+
+MIT
