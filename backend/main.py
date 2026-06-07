@@ -36,7 +36,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app",
+        "https://doc-mind-pdf-q-a-chatbot-pgl2cd3tu-onkar4160s-projects.vercel.app",
         "https://onkarsarambale11-docmind-backend.hf.space",
     ],
     allow_credentials=True,

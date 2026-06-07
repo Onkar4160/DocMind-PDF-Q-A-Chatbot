@@ -6,7 +6,7 @@ Upload a PDF, ask questions about it in plain English. The app finds the relevan
 
 | Layer    | URL                                                                                       |
 | :------- | :---------------------------------------------------------------------------------------- |
-| Frontend | [doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app](https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app) |
+| Frontend | [doc-mind-pdf-q-a-chatbot-pgl2cd3tu-onkar4160s-projects.vercel.app](https://doc-mind-pdf-q-a-chatbot-pgl2cd3tu-onkar4160s-projects.vercel.app) |
 | Backend  | [onkarsarambale11-docmind-backend.hf.space](https://onkarsarambale11-docmind-backend.hf.space) |
 
 ---
@@ -241,14 +241,14 @@ Live backend URL: `https://onkarsarambale11-docmind-backend.hf.space`
    ```
 7. Vercel auto-deploys on every push to `main`.
 
-Live frontend URL: `https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app`
+Live frontend URL: `https://doc-mind-pdf-q-a-chatbot-pgl2cd3tu-onkar4160s-projects.vercel.app`
 
 ### CORS
 
 The backend allows requests from these origins (configured in `backend/main.py`):
 
 - `http://localhost:5173` — local Vite dev server
-- `https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app` — production Vercel frontend
+- `https://doc-mind-pdf-q-a-chatbot-pgl2cd3tu-onkar4160s-projects.vercel.app` — production Vercel frontend
 - `https://onkarsarambale11-docmind-backend.hf.space` — Hugging Face Spaces backend
 
 If you redeploy the frontend to a different domain, add that domain to the `allow_origins` list in `backend/main.py`.
