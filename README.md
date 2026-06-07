@@ -222,7 +222,7 @@ Never commit your `.env` file. If you accidentally push your API key, revoke it 
 3. Add the environment variable `GEMINI_API_KEY` in the Railway dashboard.
 4. Set the **start command** to:
    ```
-   gunicorn -k uvicorn.workers.UvicornWorker main:app
+   uvicorn main:app --host 0.0.0.0 --port $PORT
    ```
 5. Railway auto-deploys on every push to `main`.
 
