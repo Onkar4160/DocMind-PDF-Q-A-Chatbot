@@ -5,10 +5,10 @@ from typing import Optional
 import fitz
 from dotenv import load_dotenv
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.schema import Document
+from langchain_core.documents import Document
 import google.generativeai as genai
 from google.api_core import exceptions as google_exceptions
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 50
 TOP_K = 5
-EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "paraphrase-MiniLM-L3-v2"
 
 SYSTEM_PROMPT = (
     "You are a helpful assistant. Answer ONLY using the provided context. "
