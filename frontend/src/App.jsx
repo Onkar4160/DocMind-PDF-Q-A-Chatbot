@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import UploadZone from './components/UploadZone'
 import ChatWindow from './components/ChatWindow'
 
-const BASE = "https://docmind-pdf-q-a-chatbot-production.up.railway.app"
+const BASE = "https://onkarsarambale11-docmind-backend.hf.space"
 
 const STORAGE_KEYS = {
   DOC_INFO: 'docmind_doc_info',

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react'
 
-const BASE = 'https://docmind-pdf-q-a-chatbot-production.up.railway.app'
+const BASE = 'https://onkarsarambale11-docmind-backend.hf.space'
 
 export default function UploadZone({ onSuccess, onError, initialFileInfo }) {
   const [state, setState] = useState(initialFileInfo ? 'done' : 'idle')

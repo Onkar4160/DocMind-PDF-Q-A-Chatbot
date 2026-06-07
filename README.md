@@ -7,7 +7,7 @@ Upload a PDF, ask questions about it in plain English. The app finds the relevan
 | Layer    | URL                                                                                       |
 | :------- | :---------------------------------------------------------------------------------------- |
 | Frontend | [doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app](https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app) |
-| Backend  | [docmind-pdf-q-a-chatbot-production.up.railway.app](https://docmind-pdf-q-a-chatbot-production.up.railway.app) |
+| Backend  | [onkarsarambale11-docmind-backend.hf.space](https://onkarsarambale11-docmind-backend.hf.space) |
 
 ---
 
@@ -28,7 +28,7 @@ Upload a PDF, ask questions about it in plain English. The app finds the relevan
 
 **Frontend:** React 18, Vite 5, plain CSS (dark theme, Inter font)
 
-**Deployment:** Backend on Railway · Frontend on Vercel
+**Deployment:** Backend on Hugging Face Spaces · Frontend on Vercel
 
 ---
 
@@ -141,7 +141,7 @@ Frontend runs at `http://localhost:5173`. Vite proxies all `/upload`, `/chat`, a
 | :--------------- | :----------- | :------- | :--------------------------------------------------- |
 | `GEMINI_API_KEY` | Backend `.env` | **Yes**  | Google Gemini API key from [AI Studio](https://aistudio.google.com/app/apikey) |
 
-For production (Railway), set `GEMINI_API_KEY` as an environment variable in the dashboard — do not use a `.env` file.
+For production (Hugging Face Spaces), set `GEMINI_API_KEY` as a secret in the Space settings — do not use a `.env` file.
 
 ---
 
@@ -215,18 +215,15 @@ Never commit your `.env` file. If you accidentally push your API key, revoke it 
 
 ## Deployment
 
-### Backend — Railway
+### Backend — Hugging Face Spaces
 
-1. Connect the GitHub repository to [Railway](https://railway.app).
-2. Set the **root directory** to `backend`.
-3. Add the environment variable `GEMINI_API_KEY` in the Railway dashboard.
-4. Set the **start command** to:
-   ```
-   gunicorn -k uvicorn.workers.UvicornWorker main:app
-   ```
-5. Railway auto-deploys on every push to `main`.
+1. Create a new Space on [Hugging Face](https://huggingface.co/spaces) with the **Docker** SDK.
+2. Push the `backend` directory as the Space repository (or use a monorepo with the Dockerfile in `backend/`).
+3. Add the secret `GEMINI_API_KEY` in the Space settings.
+4. The Dockerfile already exposes port `7860` (Hugging Face default).
+5. The Space auto-rebuilds on every push.
 
-Live backend URL: `https://docmind-pdf-q-a-chatbot-production.up.railway.app`
+Live backend URL: `https://onkarsarambale11-docmind-backend.hf.space`
 
 ### Frontend — Vercel
 
@@ -237,7 +234,7 @@ Live backend URL: `https://docmind-pdf-q-a-chatbot-production.up.railway.app`
 5. **Output directory:** `dist`
 6. No environment variables are needed — the backend URL is hardcoded in `App.jsx` and `UploadZone.jsx` as:
    ```
-   https://docmind-pdf-q-a-chatbot-production.up.railway.app
+   https://onkarsarambale11-docmind-backend.hf.space
    ```
 7. Vercel auto-deploys on every push to `main`.
 
@@ -249,6 +246,7 @@ The backend allows requests from these origins (configured in `backend/main.py`)
 
 - `http://localhost:5173` — local Vite dev server
 - `https://doc-mind-pdf-q-a-chatbot-6q1m8muzs.vercel.app` — production Vercel frontend
+- `https://onkarsarambale11-docmind-backend.hf.space` — Hugging Face Spaces backend
 
 If you redeploy the frontend to a different domain, add that domain to the `allow_origins` list in `backend/main.py`.
 
