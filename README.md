@@ -217,11 +217,14 @@ Never commit your `.env` file. If you accidentally push your API key, revoke it 
 
 ### Backend — Hugging Face Spaces
 
-1. Create a new Space on [Hugging Face](https://huggingface.co/spaces) with the **Docker** SDK.
-2. Push the `backend` directory as the Space repository (or use a monorepo with the Dockerfile in `backend/`).
-3. Add the secret `GEMINI_API_KEY` in the Space settings.
-4. The Dockerfile already exposes port `7860` (Hugging Face default).
-5. The Space auto-rebuilds on every push.
+1. Connect the GitHub repository to [Railway](https://railway.app).
+2. Set the **root directory** to `backend`.
+3. Add the environment variable `GEMINI_API_KEY` in the Railway dashboard.
+4. Set the **start command** to:
+   ```
+   uvicorn main:app --host 0.0.0.0 --port $PORT
+   ```
+5. Railway auto-deploys on every push to `main`.
 
 Live backend URL: `https://onkarsarambale11-docmind-backend.hf.space`
 
